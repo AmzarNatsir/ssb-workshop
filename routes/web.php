@@ -203,6 +203,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('master-component-troubles', \App\Http\Controllers\MasterComponentTroubleController::class);
 
 
+
     // Mechanic Jobs
     Route::get('mechanic-jobs/datatables', [\App\Http\Controllers\MechanicJobController::class, 'index'])->name('mechanic-job.datatables');
     Route::get('mechanic-jobs/{id}', [\App\Http\Controllers\MechanicJobController::class, 'show'])->name('mechanic-job.show');
@@ -211,5 +212,56 @@ Route::middleware('auth')->group(function () {
     Route::post('mechanic-jobs/{id}/finish', [\App\Http\Controllers\MechanicJobController::class, 'finishJob'])->name('mechanic-job.finish');
     Route::get('mechanic-jobs/{id}/summary', [\App\Http\Controllers\MechanicJobController::class, 'summary'])->name('mechanic-job.summary');
     Route::get('mechanic-jobs', [\App\Http\Controllers\MechanicJobController::class, 'index'])->name('mechanic-job.index');
+
+    // Inspection Forms (Admin)
+    Route::get('inspection-forms/datatables', [\App\Http\Controllers\InspectionFormController::class, 'datatables'])
+        ->name('inspection-forms.datatables');
+    Route::post('inspection-forms/{id}/publish', [\App\Http\Controllers\InspectionFormController::class, 'publish'])
+        ->name('inspection-forms.publish');
+    Route::post('inspection-forms/{id}/archive', [\App\Http\Controllers\InspectionFormController::class, 'archive'])
+        ->name('inspection-forms.archive');
+    Route::post('inspection-forms/{id}/duplicate', [\App\Http\Controllers\InspectionFormController::class, 'duplicate'])
+        ->name('inspection-forms.duplicate');
+    Route::get('inspection-forms/{id}/preview', [\App\Http\Controllers\InspectionFormController::class, 'preview'])
+        ->name('inspection-forms.preview');
+    Route::resource('inspection-forms', \App\Http\Controllers\InspectionFormController::class);
+
+    // Inspection Schedules (Admin)
+    Route::get('inspection-schedules/datatables', [\App\Http\Controllers\InspectionScheduleController::class, 'datatables'])
+        ->name('inspection-schedules.datatables');
+    Route::post('inspection-schedules/{id}/activate', [\App\Http\Controllers\InspectionScheduleController::class, 'activate'])
+        ->name('inspection-schedules.activate');
+    Route::post('inspection-schedules/{id}/deactivate', [\App\Http\Controllers\InspectionScheduleController::class, 'deactivate'])
+        ->name('inspection-schedules.deactivate');
+    Route::resource('inspection-schedules', \App\Http\Controllers\InspectionScheduleController::class);
+
+    // Inspection Execution (Inspector/Mechanic)
+    Route::get('inspections/datatables', [\App\Http\Controllers\InspectionExecutionController::class, 'datatables'])
+        ->name('inspections.datatables');
+    Route::get('inspections/{id}/execute', [\App\Http\Controllers\InspectionExecutionController::class, 'show'])
+        ->name('inspections.execute');
+    Route::post('inspections/{id}/submit', [\App\Http\Controllers\InspectionExecutionController::class, 'submit'])
+        ->name('inspections.submit');
+    Route::get('inspections/history/{unitId}', [\App\Http\Controllers\InspectionExecutionController::class, 'history'])
+        ->name('inspections.history');
+    Route::get('inspections/result/{resultId}', [\App\Http\Controllers\InspectionExecutionController::class, 'result'])
+        ->name('inspections.result');
+    Route::post('inspections/upload-image', [\App\Http\Controllers\InspectionExecutionController::class, 'uploadImage'])
+        ->name('inspections.upload-image');
+    Route::get('inspections', [\App\Http\Controllers\InspectionExecutionController::class, 'index'])
+        ->name('inspections.index');
+
+    // Tool Cards
+    Route::get('tool-cards/datatables', [\App\Http\Controllers\ToolCardController::class, 'datatables'])
+        ->name('tool-cards.datatables');
+    Route::post('tool-cards/{id}/submit', [\App\Http\Controllers\ToolCardController::class, 'submit'])
+        ->name('tool-cards.submit');
+    Route::post('tool-cards/{id}/approve', [\App\Http\Controllers\ToolCardController::class, 'approve'])
+        ->name('tool-cards.approve');
+    Route::post('tool-cards/{id}/reject', [\App\Http\Controllers\ToolCardController::class, 'reject'])
+        ->name('tool-cards.reject');
+    Route::get('tool-cards/{id}/print', [\App\Http\Controllers\ToolCardController::class, 'print'])
+        ->name('tool-cards.print');
+    Route::resource('tool-cards', \App\Http\Controllers\ToolCardController::class);
 
 });

@@ -151,14 +151,18 @@
                     <li>
                         <ul>
                             <li class="submenu">
-                                <a href="javascript:void(0);" class="{{ Request::is('inspection-form', 'inspection-report') ? 'subdrop active' : '' }}">
-                                    <i class="ti ti-report-analytics"></i><span>Periodic Inspection</span><span class="menu-arrow"></span>
+                                <a href="javascript:void(0);" class="{{ Request::is('inspection-forms*', 'inspection-schedules*', 'inspections*') ? 'subdrop active' : '' }}">
+                                    <i class="ti ti-clipboard-check"></i><span>Inspection</span><span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a class="{{ Request::is('inspection-form') ? 'active' : '' }}"
-                                            href="{{ url('inspection-form') }}">Inspection Form</a></li>
-                                    <li><a class="{{ Request::is('inspection-report') ? 'active' : '' }}"
-                                            href="{{ url('inspection-report') }}">Inspection Report</a></li>
+                                    <li><a class="{{ Request::is('inspection-forms*') ? 'active' : '' }}"
+                                            href="{{ route('inspection-forms.index') }}">Form Builder</a></li>
+                                    <li><a class="{{ Request::is('inspection-schedules*') ? 'active' : '' }}"
+                                            href="{{ route('inspection-schedules.index') }}">Schedules</a></li>
+                                    <li><a class="{{ Request::is('inspections') ? 'active' : '' }}"
+                                            href="{{ route('inspections.index') }}">My Inspections</a></li>
+                                    <li><a class="{{ Request::is('inspections/history*') ? 'active' : '' }}"
+                                            href="{{ route('inspections.history', ['unitId' => 0]) }}">History</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -190,8 +194,8 @@
                                     <i class="ti ti-report-analytics"></i><span>Manajement Tools</span><span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a class="{{ Request::is('create-tool-card') ? 'active' : '' }}"
-                                            href="{{ url('create-tool-card') }}">Create Tool Card</a></li>
+                                    <li><a class="{{ Request::is('tool-cards*') ? 'active' : '' }}"
+                                            href="{{ route('tool-cards.index') }}">Tool Card Access</a></li>
                                     <li><a class="{{ Request::is('borrowing-tool') ? 'active' : '' }}"
                                             href="{{ url('borrowing-tool') }}">Borrowing Tool</a></li>
                                     <li><a class="{{ Request::is('tools-return') ? 'active' : '' }}"
