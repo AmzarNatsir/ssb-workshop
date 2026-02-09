@@ -119,6 +119,7 @@
                     <label class="form-label small">Input Type <span class="text-danger">*</span></label>
                     <select name="sections[__SECTION__][items][__ITEM__][input_type]" class="form-select form-select-sm input-type-select" required>
                         <option value="GOOD_REPAIR_REPLACE_NA">Good / Repair / Replace / NA</option>
+                        <option value="GOOD_OTHERS">Good / Others (Text)</option>
                         <option value="YES_NO_NA">Yes / No / NA</option>
                         <option value="PASS_FAIL_NA">Pass / Fail / NA</option>
                         <option value="OK_FAULTY_NA">Ok / Faulty / NA</option>
@@ -175,9 +176,17 @@
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-12">
+                <div class="col-md-6 mb-2">
                     <label class="form-label small">Instruction</label>
                     <input type="text" name="sections[__SECTION__][items][__ITEM__][instruction]" class="form-control form-control-sm" placeholder="Instructions for inspector">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label small">Reference Image</label>
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control item-image-input" accept="image/*">
+                        <input type="hidden" name="sections[__SECTION__][items][__ITEM__][item_image]" class="item-image-path">
+                    </div>
+                    <div class="item-image-preview mt-1"></div>
                 </div>
             </div>
         </div>
@@ -278,6 +287,49 @@
                     thresholdFields.hide();
                 }
             });
+            
+            // Handle Image Upload for items
+            $(document).on('change', '.item-image-input', function() {
+                const $input = $(this);
+                const $preview = $input.closest('.col-md-6').find('.item-image-preview');
+                const $hiddenInput = $input.closest('.col-md-6').find('.item-image-path');
+                const file = $input[0].files[0];
+                
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                $preview.html('<div class="spinner-border spinner-border-sm text-primary" role="status"></div>');
+                
+                $.ajax({
+                    url: '{{ route("inspection-forms.upload-image") }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                }).done(function(response) {
+                    if (response.success) {
+                        $hiddenInput.val(response.data.path);
+                        $preview.html(`
+                            <img src="${response.data.url}" class="img-thumbnail" style="max-height: 50px;">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-item-image-btn"><i class="ti ti-x"></i></button>
+                        `);
+                    }
+                }).fail(function(xhr) {
+                    $preview.html('');
+                    showNotification(xhr.responseJSON?.message || 'Upload failed', 'error');
+                });
+            });
+
+            // Remove item image
+            $(document).on('click', '.remove-item-image-btn', function() {
+                const $itemRow = $(this).closest('.col-md-6');
+                $itemRow.find('.item-image-path').val('');
+                $itemRow.find('.item-image-preview').html('');
+                $itemRow.find('.item-image-input').val('');
+            });
 
             // Form Submit
             $('#form-builder-form').submit(function(e) {
@@ -312,6 +364,7 @@
                             threshold_warning: $item.find('[name*="threshold_warning"]').val() || null,
                             threshold_critical: $item.find('[name*="threshold_critical"]').val() || null,
                             instruction: $item.find('[name*="instruction"]').val(),
+                            item_image: $item.find('[name*="item_image"]').val() || null,
                             auto_action: autoActionType ? {
                                 action: autoActionType,
                                 priority: autoActionPriority,

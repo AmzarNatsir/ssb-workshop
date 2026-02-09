@@ -25,6 +25,7 @@ class InspectionItem extends Model
         'auto_action',
         'instruction',
         'reference_image',
+        'item_image',
     ];
 
     protected $casts = [

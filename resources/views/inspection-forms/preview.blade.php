@@ -97,6 +97,13 @@
                                                 @if($item->item_description)
                                                     <br><small class="text-muted">{{ $item->item_description }}</small>
                                                 @endif
+                                                @if($item->item_image)
+                                                    <div class="mt-1">
+                                                        <a href="{{ asset('storage/' . $item->item_image) }}" target="_blank">
+                                                            <img src="{{ asset('storage/' . $item->item_image) }}" class="img-thumbnail" style="max-height: 40px;" title="Reference Image">
+                                                        </a>
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 <span class="badge bg-info">{{ str_replace('_', ' ', $item->input_type) }}</span>

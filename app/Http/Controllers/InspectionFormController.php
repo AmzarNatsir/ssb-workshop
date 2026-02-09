@@ -85,7 +85,7 @@ class InspectionFormController extends Controller
             'sections.*.section_title' => 'required|string|max:255',
             'sections.*.items' => 'required|array|min:1',
             'sections.*.items.*.item_name' => 'required|string|max:255',
-            'sections.*.items.*.input_type' => 'required|in:NUMBER,TEXT,GOOD_REPAIR_REPLACE_NA,YES_NO_NA,PASS_FAIL_NA,OK_FAULTY_NA,IMAGE,DATE',
+            'sections.*.items.*.input_type' => 'required|in:NUMBER,TEXT,GOOD_REPAIR_REPLACE_NA,YES_NO_NA,PASS_FAIL_NA,OK_FAULTY_NA,IMAGE,DATE,GOOD_OTHERS',
         ]);
 
         try {
@@ -124,6 +124,7 @@ class InspectionFormController extends Controller
                         'auto_action' => $itemData['auto_action'] ?? null,
                         'instruction' => $itemData['instruction'] ?? null,
                         'reference_image' => $itemData['reference_image'] ?? null,
+                        'item_image' => $itemData['item_image'] ?? null,
                     ]);
                 }
             }
@@ -220,6 +221,7 @@ class InspectionFormController extends Controller
                         'auto_action' => $itemData['auto_action'] ?? null,
                         'instruction' => $itemData['instruction'] ?? null,
                         'reference_image' => $itemData['reference_image'] ?? null,
+                        'item_image' => $itemData['item_image'] ?? null,
                     ]);
                 }
             }
@@ -379,6 +381,7 @@ class InspectionFormController extends Controller
                         'auto_action' => $itemData['auto_action'] ?? null,
                         'instruction' => $itemData['instruction'] ?? null,
                         'reference_image' => $itemData['reference_image'] ?? null,
+                        'item_image' => $itemData['item_image'] ?? null,
                     ]);
                 }
             }
@@ -396,6 +399,43 @@ class InspectionFormController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create revision: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Upload item image for builder
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        try {
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $path = $image->store('inspection_items', 'public');
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Image uploaded successfully',
+                    'data' => [
+                        'path' => $path,
+                        'url' => asset('storage/' . $path)
+                    ]
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No image file provided'
+            ], 400);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to upload image: ' . $e->getMessage()
             ], 500);
         }
     }

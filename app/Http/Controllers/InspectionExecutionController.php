@@ -88,6 +88,9 @@ class InspectionExecutionController extends Controller
             'items' => 'required|array',
             'items.*.item_id' => 'required|exists:inspection_items,id',
             'notes' => 'nullable|string',
+            'section_images' => 'nullable|array',
+            'section_images.*.section_id' => 'required|exists:inspection_sections,id',
+            'section_images.*.image_path' => 'required|string',
         ]);
 
         try {
@@ -116,6 +119,16 @@ class InspectionExecutionController extends Controller
                 $value = $itemData['value_option'] ?? $itemData['value_number'] ?? $itemData['value_text'];
                 if ($item->shouldTriggerAutoAction($value)) {
                     $this->triggerAutoAction($result, $item, $resultItem, $value);
+                }
+            }
+
+            // Save section images
+            if ($request->has('section_images')) {
+                foreach ($request->section_images as $sectionImageData) {
+                    \App\Models\InspectionSectionResult::updateOrCreate(
+                        ['result_id' => $result->id, 'section_id' => $sectionImageData['section_id']],
+                        ['image_path' => $sectionImageData['image_path']]
+                    );
                 }
             }
 
@@ -182,13 +195,22 @@ class InspectionExecutionController extends Controller
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg|max:5120', // Max 5MB
-            'item_id' => 'required|exists:inspection_items,id'
+            'item_id' => 'nullable|exists:inspection_items,id',
+            'section_id' => 'nullable|exists:inspection_sections,id'
         ]);
 
         try {
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $filename = time() . '_' . $request->item_id . '_' . $image->getClientOriginalName();
+                
+                $identifier = 'unknown';
+                if ($request->item_id) {
+                    $identifier = 'item_' . $request->item_id;
+                } elseif ($request->section_id) {
+                    $identifier = 'section_' . $request->section_id;
+                }
+                
+                $filename = time() . '_' . $identifier . '_' . $image->getClientOriginalName();
                 $path = $image->storeAs('inspections', $filename, 'public');
 
                 return response()->json([

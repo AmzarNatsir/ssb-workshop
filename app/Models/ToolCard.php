@@ -59,4 +59,43 @@ class ToolCard extends Model
     {
         return $this->hasMany(ToolCardApproval::class);
     }
+
+    public function loanTransactions()
+    {
+        return $this->hasMany(LoanTransaction::class);
+    }
+
+    public function getActiveLoans()
+    {
+        return $this->loanTransactions()->where('status', 'Active')->get();
+    }
+
+    public function canBorrowTool($tool)
+    {
+        // Check if tool card is approved
+        if ($this->status !== 'APPROVED_FINAL') {
+            return [
+                'can_borrow' => false,
+                'message' => 'Tool card is not approved'
+            ];
+        }
+
+        // Check access level (hierarchical: 3 can access all, 2 can access 1-2, 1 only 1)
+        if ($this->access_level < $tool->required_access_level) {
+            return [
+                'can_borrow' => false,
+                'message' => 'Insufficient access level for this tool'
+            ];
+        }
+
+        return [
+            'can_borrow' => true,
+            'message' => 'Access granted'
+        ];
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'APPROVED_FINAL');
+    }
 }

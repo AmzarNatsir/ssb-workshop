@@ -9,6 +9,7 @@
             <label class="form-label small">Input Type <span class="text-danger">*</span></label>
             <select name="sections[{{ $sIndex }}][items][{{ $iIndex }}][input_type]" class="form-select form-select-sm input-type-select" required>
                 <option value="GOOD_REPAIR_REPLACE_NA" {{ $item->input_type == 'GOOD_REPAIR_REPLACE_NA' ? 'selected' : '' }}>Good / Repair / Replace / NA</option>
+                <option value="GOOD_OTHERS" {{ $item->input_type == 'GOOD_OTHERS' ? 'selected' : '' }}>Good / Others (Text)</option>
                 <option value="YES_NO_NA" {{ $item->input_type == 'YES_NO_NA' ? 'selected' : '' }}>Yes / No / NA</option>
                 <option value="PASS_FAIL_NA" {{ $item->input_type == 'PASS_FAIL_NA' ? 'selected' : '' }}>Pass / Fail / NA</option>
                 <option value="OK_FAULTY_NA" {{ $item->input_type == 'OK_FAULTY_NA' ? 'selected' : '' }}>Ok / Faulty / NA</option>
@@ -71,9 +72,22 @@
         </div>
     </div>
     <div class="row mt-2">
-        <div class="col-12">
+        <div class="col-md-6">
             <label class="form-label small">Instruction</label>
             <input type="text" name="sections[{{ $sIndex }}][items][{{ $iIndex }}][instruction]" class="form-control form-control-sm" placeholder="Instructions for inspector" value="{{ $item->instruction }}">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label small">Reference Image</label>
+            <div class="input-group input-group-sm">
+                <input type="file" class="form-control item-image-input" accept="image/*">
+                <input type="hidden" name="sections[{{ $sIndex }}][items][{{ $iIndex }}][item_image]" class="item-image-path" value="{{ $item->item_image }}">
+            </div>
+            <div class="item-image-preview mt-1">
+                @if($item->item_image)
+                    <img src="{{ asset('storage/' . $item->item_image) }}" class="img-thumbnail" style="max-height: 50px;">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-item-image-btn"><i class="ti ti-x"></i></button>
+                @endif
+            </div>
         </div>
     </div>
 </div>

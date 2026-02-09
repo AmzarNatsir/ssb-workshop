@@ -108,6 +108,11 @@ class InspectionResult extends Model
         return $this->hasMany(InspectionResultItem::class, 'result_id');
     }
 
+    public function sectionResults()
+    {
+        return $this->hasMany(InspectionSectionResult::class, 'result_id');
+    }
+
     /**
      * Business Methods
      */

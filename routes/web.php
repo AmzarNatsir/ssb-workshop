@@ -224,6 +224,8 @@ Route::middleware('auth')->group(function () {
         ->name('inspection-forms.duplicate');
     Route::get('inspection-forms/{id}/preview', [\App\Http\Controllers\InspectionFormController::class, 'preview'])
         ->name('inspection-forms.preview');
+    Route::post('inspection-forms/upload-image', [\App\Http\Controllers\InspectionFormController::class, 'uploadImage'])
+        ->name('inspection-forms.upload-image');
     Route::resource('inspection-forms', \App\Http\Controllers\InspectionFormController::class);
 
     // Inspection Schedules (Admin)
@@ -263,5 +265,89 @@ Route::middleware('auth')->group(function () {
     Route::get('tool-cards/{id}/print', [\App\Http\Controllers\ToolCardController::class, 'print'])
         ->name('tool-cards.print');
     Route::resource('tool-cards', \App\Http\Controllers\ToolCardController::class);
+
+    // Tool Lending Module Routes
+    Route::prefix('tool-lending')->middleware(['auth'])->name('tool-lending.')->group(function () {
+        
+        // Tool Card Scanning API
+        Route::get('scan/tool-card/{barcode}', [\App\Http\Controllers\ToolCardScanController::class, 'scanToolCard'])
+            ->name('scan.tool-card');
+        
+        // Tool Scanning & Availability API
+        Route::get('scan/tool/{barcode}', [\App\Http\Controllers\LoanTransactionController::class, 'scanTool'])
+            ->name('scan.tool');
+        Route::get('tools/available/{accessLevel}', [\App\Http\Controllers\LoanTransactionController::class, 'getAvailableTools'])
+            ->name('tools.available');
+        
+        // Loan Transactions
+        Route::get('loans', [\App\Http\Controllers\LoanTransactionController::class, 'index'])
+            ->name('loans.index');
+        Route::get('loans/create', [\App\Http\Controllers\LoanTransactionController::class, 'create'])
+            ->name('loans.create');
+        Route::post('loans', [\App\Http\Controllers\LoanTransactionController::class, 'store'])
+            ->name('loans.store');
+        Route::get('loans/history', [\App\Http\Controllers\LoanTransactionController::class, 'history'])
+            ->name('loans.history');
+        Route::get('loans/{loanNumber}', [\App\Http\Controllers\LoanTransactionController::class, 'show'])
+            ->name('loans.show');
+        Route::get('loans/{loanNumber}/return', [\App\Http\Controllers\LoanTransactionController::class, 'returnForm'])
+            ->name('loans.return');
+        Route::post('loans/process-return', [\App\Http\Controllers\LoanTransactionController::class, 'processReturn'])
+            ->name('loans.process-return');
+        
+        // System Settings
+        Route::get('settings', [\App\Http\Controllers\SystemSettingController::class, 'index'])
+            ->name('settings.index');
+        Route::put('settings', [\App\Http\Controllers\SystemSettingController::class, 'update'])
+            ->name('settings.update');
+
+        // Tool Incident/Report Module
+        Route::get('incidents', [\App\Http\Controllers\ToolIncidentController::class, 'index'])
+            ->name('incidents.index');
+        Route::get('incidents/{id}/edit', [\App\Http\Controllers\ToolIncidentController::class, 'edit'])
+            ->name('incidents.edit');
+        Route::put('incidents/{id}', [\App\Http\Controllers\ToolIncidentController::class, 'update'])
+            ->name('incidents.update');
+        Route::get('incidents/{id}', [\App\Http\Controllers\ToolIncidentController::class, 'show'])
+             ->name('incidents.show');
+        Route::post('incidents/{id}/submit', [\App\Http\Controllers\ToolIncidentController::class, 'submit'])
+            ->name('incidents.submit');
+        Route::post('incidents/{id}/approve-mtn', [\App\Http\Controllers\ToolIncidentController::class, 'approveMtn'])
+            ->name('incidents.approve-mtn');
+        Route::post('incidents/{id}/approve-hr', [\App\Http\Controllers\ToolIncidentController::class, 'approveHr'])
+            ->name('incidents.approve-hr');
+        Route::get('incidents/create-from-opname', [\App\Http\Controllers\ToolIncidentController::class, 'createFromOpname'])
+            ->name('incidents.create-from-opname');
+        Route::post('incidents/{id}/reject', [\App\Http\Controllers\ToolIncidentController::class, 'reject'])
+            ->name('incidents.reject');
+
+        // Tool Stock Opname
+        Route::get('stock-opname', [\App\Http\Controllers\ToolStockOpnameController::class, 'index'])
+            ->name('stock-opname.index');
+        Route::get('stock-opname/create', [\App\Http\Controllers\ToolStockOpnameController::class, 'create'])
+            ->name('stock-opname.create');
+        Route::post('stock-opname', [\App\Http\Controllers\ToolStockOpnameController::class, 'store'])
+            ->name('stock-opname.store');
+        Route::get('stock-opname/{id}', [\App\Http\Controllers\ToolStockOpnameController::class, 'show'])
+            ->name('stock-opname.show');
+        Route::post('stock-opname/{id}/update-detail', [\App\Http\Controllers\ToolStockOpnameController::class, 'updateDetail'])
+            ->name('stock-opname.update-detail');
+        Route::get('stock-opname/{id}/pdf', [\App\Http\Controllers\ToolStockOpnameController::class, 'exportPdf'])
+            ->name('stock-opname.pdf');
+        Route::post('stock-opname/{id}/add-finding', [\App\Http\Controllers\ToolStockOpnameController::class, 'addFinding'])
+            ->name('stock-opname.add-finding');
+        Route::post('stock-opname/{id}/finalize', [\App\Http\Controllers\ToolStockOpnameController::class, 'finalize'])
+            ->name('stock-opname.finalize');
+
+        // Tool Transaction Report Module
+        Route::get('reports', [\App\Http\Controllers\ToolReportController::class, 'index'])
+            ->name('reports.index');
+        Route::get('reports/history', [\App\Http\Controllers\ToolReportController::class, 'history'])
+            ->name('reports.history');
+        Route::get('reports/chart-data', [\App\Http\Controllers\ToolReportController::class, 'getChartData'])
+            ->name('reports.chart-data');
+        Route::get('reports/export', [\App\Http\Controllers\ToolReportController::class, 'export'])
+            ->name('reports.export');
+    });
 
 });

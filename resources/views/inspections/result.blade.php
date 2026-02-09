@@ -115,6 +115,13 @@
                                                 @if($item->item_description)
                                                     <br><small class="text-muted">{{ $item->item_description }}</small>
                                                 @endif
+                                                @if($item->item_image)
+                                                    <div class="mt-1">
+                                                        <a href="{{ asset('storage/' . $item->item_image) }}" target="_blank">
+                                                            <img src="{{ asset('storage/' . $item->item_image) }}" class="img-thumbnail" style="max-height: 40px;" title="Reference Image">
+                                                        </a>
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($resultItem)
@@ -176,21 +183,37 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        @php
+                            $sectionResult = $result->sectionResults->where('section_id', $section->id)->first();
+                        @endphp
+                        @if($sectionResult && $sectionResult->image_path)
+                            <div class="mt-4 pt-3 border-top">
+                                <label class="form-label fw-semibold">Section Documentation Image</label>
+                                <div class="mt-2">
+                                    <a href="{{ asset('storage/' . $sectionResult->image_path) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $sectionResult->image_path) }}" class="img-thumbnail" style="max-height: 200px;">
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endforeach
 
             <!-- General Notes -->
-            @if($result->notes)
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header border-bottom bg-light">
                         <h5 class="card-title mb-0">General Notes</h5>
                     </div>
                     <div class="card-body">
-                        <p class="mb-0">{{ $result->notes }}</p>
+                        @if($result->notes)
+                            <p class="mb-0">{{ $result->notes }}</p>
+                        @else
+                            <p class="text-muted mb-0">No notes provided.</p>
+                        @endif
                     </div>
                 </div>
-            @endif
 
         </div>
         @component('components.footer')

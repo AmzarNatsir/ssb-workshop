@@ -103,9 +103,6 @@
                             <li class="{{ Request::is('assets', 'assets-details', 'assets-list') ? 'active' : '' }}">
                                 <a href="{{url('assets')}}"><i class="ti ti-atom-2"></i><span>Assets</span></a>
                             </li>
-                            <li class=" {{ Request::is('tools*') ? 'active' : '' }}">
-                                <a href="{{route('tools.index')}}" ><i class="ti ti-atom-2"></i><span>Tools</span></a>
-                            </li>
                         </ul>
                     </li>
                     <li class="menu-title"><span>SETTING</span></li>
@@ -190,20 +187,28 @@
                     <li>
                         <ul>
                             <li class="submenu">
-                                <a href="javascript:void(0);" class="{{ Request::is('manajement-tools', 'unit-change') ? 'subdrop active' : '' }}">
-                                    <i class="ti ti-report-analytics"></i><span>Manajement Tools</span><span class="menu-arrow"></span>
+                                <a href="javascript:void(0);" class="{{ Request::is('tool-cards*', 'tool-lending*') ? 'subdrop active' : '' }}">
+                                    <i class="ti ti-tools"></i><span>Management Tools</span><span class="menu-arrow"></span>
                                 </a>
                                 <ul>
+                                    <li><a class="{{ Request::is('tools*') ? 'active' : '' }}" 
+                                            href="{{route('tools.index')}}">Tools</a></li>
                                     <li><a class="{{ Request::is('tool-cards*') ? 'active' : '' }}"
                                             href="{{ route('tool-cards.index') }}">Tool Card Access</a></li>
-                                    <li><a class="{{ Request::is('borrowing-tool') ? 'active' : '' }}"
-                                            href="{{ url('borrowing-tool') }}">Borrowing Tool</a></li>
-                                    <li><a class="{{ Request::is('tools-return') ? 'active' : '' }}"
-                                            href="{{ url('tools-return') }}">Tools Return</a></li>
-                                    <li><a class="{{ Request::is('minutes-of-tools') ? 'active' : '' }}"
-                                            href="{{ url('minutes-of-tools') }}">Minutes of Tools</a></li>
-                                    <li><a class="{{ Request::is('opname-tools') ? 'active' : '' }}"
-                                            href="{{ url('opname-tools') }}">Opname Tools</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/loans/create') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.loans.create') }}">Borrowing Tool</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/loans') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.loans.index') }}">Active Loans</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/loans/history') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.loans.history') }}">Loan History</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/incidents*') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.incidents.index') }}">Report Incident (BA)</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/stock-opname*') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.stock-opname.index') }}">Opname Tools</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/reports*') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.reports.index') }}">History Report (TX)</a></li>
+                                    <li><a class="{{ Request::is('tool-lending/settings') ? 'active' : '' }}"
+                                            href="{{ route('tool-lending.settings.index') }}">Lending Settings</a></li>
                                 </ul>
                             </li>
                         </ul>

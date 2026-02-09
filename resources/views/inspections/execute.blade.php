@@ -71,6 +71,13 @@
                                             @if($item->instruction)
                                                 <p class="text-info small mb-0"><i class="ti ti-info-circle"></i> {{ $item->instruction }}</p>
                                             @endif
+                                            @if($item->item_image)
+                                                <div class="mt-2">
+                                                    <a href="{{ asset('storage/' . $item->item_image) }}" target="_blank">
+                                                        <img src="{{ asset('storage/' . $item->item_image) }}" class="img-thumbnail" style="max-height: 100px;" title="Reference Image">
+                                                    </a>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -89,6 +96,20 @@
                                             
                                             <input type="radio" class="btn-check" name="items[{{ $loop->parent->index }}_{{ $loop->index }}][value_option]" id="item_{{ $item->id }}_na" value="NA">
                                             <label class="btn btn-outline-secondary" for="item_{{ $item->id }}_na">N/A</label>
+                                        </div>
+
+                                    @elseif($item->input_type == 'GOOD_OTHERS')
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="btn-group" role="group">
+                                                <input type="radio" class="btn-check good-others-radio" name="items[{{ $loop->parent->index }}_{{ $loop->index }}][value_option]" id="item_{{ $item->id }}_good" value="Good" data-item-id="{{ $item->id }}" {{ $item->is_required ? 'required' : '' }}>
+                                                <label class="btn btn-outline-success" for="item_{{ $item->id }}_good">Good</label>
+                                                
+                                                <input type="radio" class="btn-check good-others-radio" name="items[{{ $loop->parent->index }}_{{ $loop->index }}][value_option]" id="item_{{ $item->id }}_others" value="Others" data-item-id="{{ $item->id }}">
+                                                <label class="btn btn-outline-secondary" for="item_{{ $item->id }}_others">Others</label>
+                                            </div>
+                                            <div class="others-text-input" id="others_input_{{ $item->id }}" style="display: none;">
+                                                <input type="text" name="items[{{ $loop->parent->index }}_{{ $loop->index }}][value_text]" class="form-control" placeholder="Please specify...">
+                                            </div>
                                         </div>
 
                                     @elseif($item->input_type == 'YES_NO_NA')
@@ -156,6 +177,18 @@
                                     </div>
                                 </div>
                             @endforeach
+
+                            <!-- Section Image Upload -->
+                            <div class="mt-4 pt-3 border-top section-image-upload-container" data-section-id="{{ $section->id }}">
+                                <label class="form-label fw-semibold">Section Documentation Image</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="flex-grow-1">
+                                        <input type="file" class="form-control section-image-input" accept="image/*" data-section-id="{{ $section->id }}">
+                                        <input type="hidden" name="sections[{{ $loop->index }}][image_path]" class="section-image-path-input">
+                                    </div>
+                                    <div class="section-image-preview"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -263,6 +296,56 @@
                 }
             });
 
+            // Good / Others Toggle
+            $(document).on('change', '.good-others-radio', function() {
+                const itemId = $(this).data('item-id');
+                const value = $(this).val();
+                const $inputDiv = $('#others_input_' + itemId);
+                const $textInput = $inputDiv.find('input');
+
+                if (value === 'Others') {
+                    $inputDiv.slideDown();
+                    $textInput.prop('required', true);
+                } else {
+                    $inputDiv.slideUp();
+                    $textInput.prop('required', false).val('');
+                }
+            });
+
+            // Section Image upload
+            $('.section-image-input').change(function() {
+                const file = this.files[0];
+                const sectionId = $(this).data('section-id');
+                const container = $(this).closest('.section-image-upload-container');
+                const preview = container.find('.section-image-preview');
+                const pathInput = container.find('.section-image-path-input');
+
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    formData.append('section_id', sectionId);
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    $.ajax({
+                        url: '{{ route("inspections.upload-image") }}',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.success) {
+                                pathInput.val(response.data.path);
+                                preview.html(`<img src="${response.data.url}" class="img-thumbnail" style="max-height: 50px;">`);
+                                showNotification('Section image uploaded successfully', 'success');
+                            }
+                        },
+                        error: function(xhr) {
+                            showNotification(xhr.responseJSON?.message || 'Failed to upload image', 'error');
+                        }
+                    });
+                }
+            });
+
             // Form submission
             $('#inspection-form').submit(function(e) {
                 e.preventDefault();
@@ -285,6 +368,19 @@
 
                 formData.items = items;
                 formData.notes = $('[name="notes"]').val();
+                
+                const sectionImages = [];
+                $('.section-image-upload-container').each(function() {
+                    const sectionId = $(this).data('section-id');
+                    const path = $(this).find('.section-image-path-input').val();
+                    if (path) {
+                        sectionImages.push({
+                            section_id: sectionId,
+                            image_path: path
+                        });
+                    }
+                });
+                formData.section_images = sectionImages;
 
                 $.ajax({
                     url: '{{ route("inspections.submit", $result->id) }}',
