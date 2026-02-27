@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'project' => [
+        'url'   => env('API_PROJECT_URL', 'http://127.0.0.1:8000'),
+        'token' => env('PROJECT_API_TOKEN'),
+    ],
+
 ];

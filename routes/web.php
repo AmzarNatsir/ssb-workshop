@@ -163,6 +163,18 @@ Route::middleware('auth')->group(function () {
     Route::post('work-request/{id}/create-work-order', [WorkRequestController::class, 'createWorkOrder'])->name('work-request.create-work-order');
     Route::resource('work-request', WorkRequestController::class);
 
+    // Unit Request
+    Route::get('unit-request/datatables', [\App\Http\Controllers\UnitRequestController::class, 'datatables'])
+        ->name('unit-request.datatables');
+    Route::get('unit-request/project-search', [\App\Http\Controllers\UnitRequestController::class, 'projectSearch'])
+        ->name('unit-request.project-search');
+    Route::post('unit-request/sync', [\App\Http\Controllers\UnitRequestController::class, 'sync'])->name('unit-request.sync');
+    Route::post('unit-request/{id}/submit', [\App\Http\Controllers\UnitRequestController::class, 'submitToGA'])->name('unit-request.submit');
+    Route::post('unit-request/{id}/validate-ga', [\App\Http\Controllers\UnitRequestController::class, 'validateGA'])->name('unit-request.validate-ga');
+    Route::post('unit-request/{id}/approve-om', [\App\Http\Controllers\UnitRequestController::class, 'approveOM'])->name('unit-request.approve-om');
+    Route::post('unit-request/{id}/finalize-validation', [\App\Http\Controllers\UnitRequestController::class, 'validateFinalized'])->name('unit-request.finalize-validation');
+    Route::resource('unit-request', \App\Http\Controllers\UnitRequestController::class);
+
     // Approval Center
     Route::get('approval-center/work-request', [\App\Http\Controllers\WorkRequestApprovalController::class, 'index'])->name('approval-center.work-request.index');
     Route::get('approval-center/work-request/datatables', [\App\Http\Controllers\WorkRequestApprovalController::class, 'datatables'])->name('approval-center.work-request.datatables');
